@@ -62,12 +62,12 @@ def executeInsert(data: Union[dict, list], table: str,  db: MySQLdb.Connection):
         db.rollback()
     return False
 
-def saveLastCommit(commitSha: str, db: MySQLdb.Connection):
-    executeInsert({'LAST_COMMIT_PROCESSED': commitSha}, 'TOR_REPO_METADATA', db)
+def saveLastCommit(commitSha: str, repositoryUrl: str, db: MySQLdb.Connection):
+    executeInsert({'LAST_COMMIT_PROCESSED': commitSha, 'REPOSITORY_URL': repositoryUrl}, 'TOR_REPO_METADATA', db)
 
-def getLastCommitProcessed(db: MySQLdb.Connection) -> str:
-    sql = """
-        SELECT LAST_COMMIT_PROCESSED FROM TOR_REPO_METADATA order by CREATED_AT desc limit 1;
+def getLastCommitProcessed(repositoryUrl: str, db: MySQLdb.Connection) -> str:
+    sql = f"""
+        SELECT LAST_COMMIT_PROCESSED FROM TOR_REPO_METADATA WHERE REPOSITORY_URL = '{repositoryUrl}' order by CREATED_AT desc limit 1;
     """
     result = executeQuery(sql, db)
     if result and len(result):
