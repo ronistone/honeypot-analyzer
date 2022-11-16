@@ -1,6 +1,6 @@
 
 import json
-from .database_utils import connectToDatabase, executeInsert
+import database_utils
 
 
 logs = []
@@ -21,11 +21,12 @@ fields = []
 biggiestField = -1
 biggiestFieldName = None
 
-db = connectToDatabase()
+db = database_utils.connectToDatabase()
 
+database_utils.executeInsert(logs, "LOGS", db)
 
 for log in logs:
-    executeInsert(log, db)
+    # database_utils.executeInsert(log, "LOGS", db)
     for field in log.keys():
         if allFields.get(field) is not True:
             allFields[field] = True

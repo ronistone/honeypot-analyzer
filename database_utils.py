@@ -16,7 +16,7 @@ DATABASE_FIELDNAME_OVERRIDE = {
     "outfile": "outfileField"
 }
 
-processing_pool = multiprocessing.Pool(24)
+# processing_pool = multiprocessing.Pool(24)
 
 def connectToDatabase() -> MySQLdb.Connection:
     return MySQLdb.connect(

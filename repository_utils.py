@@ -1,5 +1,6 @@
 import os
 import git
+import ipcalc
 
 TOR_IPS_REPOSITORY = 'https://github.com/SecOps-Institute/Tor-IP-Addresses.git'
 TOR_IPS_WORKDIR_PATH = '/tmp/tor-ip'
@@ -82,7 +83,9 @@ class VpnRepositoryProcess(RepositoryProcess):
 
             ip: str
             for ip in add:
-                subnet, netmask = ip.split('/')
+                subnet = ipcalc.Network(ip)
+                netmask = str(subnet.netmask())
+                subnet = ip.split('/')[0]
                 ips.append({
                     'SUBNET': subnet,
                     'NETMASK': netmask,
