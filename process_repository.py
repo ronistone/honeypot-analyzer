@@ -51,13 +51,12 @@ def process_repo(repositoryProcess: repository_utils.RepositoryProcess, db: MySQ
     last_commit = database_utils.getLastCommitProcessed(repositoryProcess.repositoryUrl, db)
     _,commits = repository_utils.build_git_repo_and_get_commits(repositoryProcess, last_commit)
     
-
     if commits and len(commits):
         for commit in commits:
             ips = process_commit(commit, repositoryProcess)
             print(commit.hexsha)
-
             # print(ips)
+            # break
             database_utils.executeInsert(ips, repositoryProcess.table, db)
         database_utils.saveLastCommit(commits[-1].hexsha, repositoryProcess.repositoryUrl, db)
     else:
@@ -66,11 +65,14 @@ def process_repo(repositoryProcess: repository_utils.RepositoryProcess, db: MySQ
 if __name__ == '__main__':
     db = database_utils.connectToDatabase()
 
-    torRepositoryProcess = repository_utils.TorRepositoryProcess()
-    process_repo(torRepositoryProcess, db)
+    # torRepositoryProcess = repository_utils.TorRepositoryProcess()
+    # process_repo(torRepositoryProcess, db)
 
-    vpnRepositoryProcess = repository_utils.VpnRepositoryProcess()
-    process_repo(vpnRepositoryProcess, db)
+    # vpnRepositoryProcess = repository_utils.VpnRepositoryProcess()
+    # process_repo(vpnRepositoryProcess, db)
+
+    cloudRepositoryProcess = repository_utils.CloudRepositoryProcess()
+    process_repo(cloudRepositoryProcess, db)
 
 
     

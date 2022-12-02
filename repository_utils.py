@@ -6,6 +6,8 @@ TOR_IPS_REPOSITORY = 'https://github.com/SecOps-Institute/Tor-IP-Addresses.git'
 TOR_IPS_WORKDIR_PATH = '/tmp/tor-ip'
 VPN_LIST_URL = 'https://github.com/X4BNet/lists_vpn.git'
 VPN_LIST_WORKDIR_PATH = '/tmp/vpn-list'
+CLOUD_LIST_URL = 'https://github.com/jhassine/server-ip-addresses.git'
+CLOUD_LIST_WORKDIR_PATH = '/tmp/cloud-list'
 IPV6 = 6
 IPV4 = 4
 
@@ -65,31 +67,36 @@ class TorRepositoryProcess(RepositoryProcess):
             })
         return ips
 
-class VpnRepositoryProcess(RepositoryProcess):
-        def __init__(self):
+class SubnetRepositoryProcess(RepositoryProcess):
+        def __init__(self, type, workdir, repoUrl, branch, skipNum, filePath):
             super().__init__(
-                VPN_LIST_WORKDIR_PATH, 
-                VPN_LIST_URL, 
-                "main",
+                workdir, 
+                repoUrl, 
+                branch,
                 "SUBNET",
-                18,
+                skipNum,
                 {
-                    'ipv4.txt': 'build_ip_changed'
+                    filePath : 'build_ip_changed'
                 }
             )
+            self.type = type
 
         def build_ip_changed(self, add, deleted, timestamp, isExit=False):
             ips = []
 
             ip: str
             for ip in add:
-                subnet = ipcalc.Network(ip)
+                try:
+                    subnet = ipcalc.Network(ip)
+                except Exception as e:
+                    print("\n\n\n\n\n break:\n", e, "\n\n\n")
+                    continue
                 netmask = str(subnet.netmask())
                 subnet = ip.split('/')[0]
                 ips.append({
                     'SUBNET': subnet,
                     'NETMASK': netmask,
-                    'IP_TYPE': 'VPN',
+                    'IP_TYPE': self.type,
                     'ENTRY_TIME': timestamp,
                     'IP_VERSION': IPV4
                 })
@@ -98,11 +105,20 @@ class VpnRepositoryProcess(RepositoryProcess):
                 ips.append({
                     'SUBNET': subnet,
                     'NETMASK': netmask,
-                    'IP_TYPE': 'VPN',
+                    'IP_TYPE': self.type,
                     'EXIT_TIME': timestamp,
                     'IP_VERSION': IPV4
                 })
             return ips
+
+
+class VpnRepositoryProcess(SubnetRepositoryProcess):
+    def __init__(self):
+        super().__init__('VPN', VPN_LIST_WORKDIR_PATH, VPN_LIST_URL, 'main', 18, 'ipv4.txt')
+
+class CloudRepositoryProcess(SubnetRepositoryProcess):
+    def __init__(self):
+        super().__init__('CLOUD', CLOUD_LIST_WORKDIR_PATH, CLOUD_LIST_URL, 'master', 17, 'data/datacenters.txt')
 
 def build_git_repo_and_get_commits(repositoryInfo: RepositoryProcess, last_commit: str):
     try:
