@@ -1,6 +1,7 @@
 import os
 import git
 import ipcalc
+import ip_utils
 
 TOR_IPS_REPOSITORY = 'https://github.com/SecOps-Institute/Tor-IP-Addresses.git'
 TOR_IPS_WORKDIR_PATH = '/tmp/tor-ip'
@@ -87,12 +88,9 @@ class SubnetRepositoryProcess(RepositoryProcess):
             ip: str
             for ip in add:
                 try:
-                    subnet = ipcalc.Network(ip)
+                    subnet,netmask = ip_utils.convertNetmask(ip)
                 except Exception as e:
-                    print("\n\n\n\n\n break:\n", e, "\n\n\n")
                     continue
-                netmask = str(subnet.netmask())
-                subnet = ip.split('/')[0]
                 ips.append({
                     'SUBNET': subnet,
                     'NETMASK': netmask,
@@ -101,7 +99,10 @@ class SubnetRepositoryProcess(RepositoryProcess):
                     'IP_VERSION': IPV4
                 })
             for ip in deleted:
-                subnet, netmask = ip.split('/')
+                try:
+                    subnet,netmask = ip_utils.convertNetmask(ip)
+                except Exception as e:
+                    continue
                 ips.append({
                     'SUBNET': subnet,
                     'NETMASK': netmask,

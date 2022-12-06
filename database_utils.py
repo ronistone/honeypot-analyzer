@@ -1,5 +1,6 @@
 from typing import Union
 import MySQLdb
+import MySQLdb.cursors
 from sqlescapy import sqlescape
 from datetime import datetime
 import multiprocessing
@@ -23,7 +24,8 @@ def connectToDatabase() -> MySQLdb.Connection:
         host=DATABASE_HOST,
         user=DATABASE_USER, 
         passwd=DATABASE_PASS, 
-        db=DATABASE_DB)
+        db=DATABASE_DB,
+        cursorclass=MySQLdb.cursors.DictCursor)
 
 
 def format_insert_data(data):
@@ -58,7 +60,7 @@ def executeInsert(data: Union[dict, list], table: str,  db: MySQLdb.Connection):
         db.commit()
         return True
     except Exception as e:
-        print(e)
+        print("\n\n\n\nFail:\n", e, "\n\n\n\n")
         db.rollback()
     return False
 
@@ -71,7 +73,7 @@ def getLastCommitProcessed(repositoryUrl: str, db: MySQLdb.Connection) -> str:
     """
     result = executeQuery(sql, db)
     if result and len(result):
-        return result[0]
+        return result['LAST_COMMIT_PROCESSED']
     else:
         return None
 
@@ -86,6 +88,16 @@ def executeQuery(query, db: MySQLdb.Connection):
         print(e)
         raise e
         
+def executeQueryMany(query, db: MySQLdb.Connection):
+    cursor = db.cursor()
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        db.commit()
+        return list(result)
+    except Exception as e:
+        print(e)
+        raise e
 
 def doInsert(data, table, cursor):
     fieldsProcessed, valuesProcessed = format_insert_data(data)

@@ -44,7 +44,7 @@ for log in logs:
 fields.sort()
 print("Logs list size: ",len(logs))
 print("Size of all fields:", len(fields))
-print("All fields in log:", fields)
+# print("All fields in log:", fields)
 print("The biggiest field is: ", biggiestFieldName, " with size ", biggiestField)
 
 

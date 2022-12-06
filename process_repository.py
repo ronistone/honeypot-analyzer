@@ -65,11 +65,11 @@ def process_repo(repositoryProcess: repository_utils.RepositoryProcess, db: MySQ
 if __name__ == '__main__':
     db = database_utils.connectToDatabase()
 
-    # torRepositoryProcess = repository_utils.TorRepositoryProcess()
-    # process_repo(torRepositoryProcess, db)
+    torRepositoryProcess = repository_utils.TorRepositoryProcess()
+    process_repo(torRepositoryProcess, db)
 
-    # vpnRepositoryProcess = repository_utils.VpnRepositoryProcess()
-    # process_repo(vpnRepositoryProcess, db)
+    vpnRepositoryProcess = repository_utils.VpnRepositoryProcess()
+    process_repo(vpnRepositoryProcess, db)
 
     cloudRepositoryProcess = repository_utils.CloudRepositoryProcess()
     process_repo(cloudRepositoryProcess, db)
