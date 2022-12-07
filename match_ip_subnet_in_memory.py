@@ -21,7 +21,7 @@ def binarySearch(dataToSearch: list, value: int):
     raise 'NOT FOUND'
 
 def buildUpdateStatement(subnetFound, ip):
-    return f"UPDATE PROCESSED_IPS_COPY set COUNTRY='{subnetFound['COUNTRY']}', PROVIDER='{subnetFound['PROVIDER']}' WHERE ID ={ip['id']}"
+    return f"UPDATE PROCESSED_IPS set COUNTRY='{subnetFound['COUNTRY']}', PROVIDER='{subnetFound['PROVIDER']}' WHERE ID ={ip['id']}"
 
 
 if __name__ == "__main__":
@@ -57,5 +57,6 @@ if __name__ == "__main__":
         pprint(notFoundIps)
 
     # print(matchIps)
-
+    print('Finish process IPs')
+    print('Initing update database...')
     database_utils.executeUpdateMany(matchIps, db)
