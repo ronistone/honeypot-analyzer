@@ -97,6 +97,7 @@ def executeQueryMany(query, db: MySQLdb.Connection):
         return list(result)
     except Exception as e:
         print(e)
+        db.rollback()
         raise e
 
 def doInsert(data, table, cursor):
@@ -106,3 +107,14 @@ def doInsert(data, table, cursor):
                 INSERT INTO {table}({fieldsProcessed}) VALUES ({valuesProcessed})
             """
     cursor.execute(sql)
+
+def executeUpdateMany(updates: list, db: MySQLdb.Connection):
+    cursor = db.cursor()
+    try:
+        for statement in updates:
+            cursor.execute(statement)
+        db.commit()
+    except Exception as e:
+        print(e)
+        db.rollback()
+        raise e
